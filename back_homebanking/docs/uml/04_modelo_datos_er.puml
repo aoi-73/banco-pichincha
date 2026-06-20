@@ -1,0 +1,158 @@
+@startuml modelo_datos_er
+' Modelo de datos (ER) - tablas REUTILIZADas de bd_core_financiero (no se crean nuevas)
+skinparam linetype ortho
+hide circle
+title Homebanking — Modelo de datos (tablas reutilizadas de bd_core_financiero)
+
+entity "dcliente" as dcliente {
+  * pkcliente : int <<PK>>
+  --
+  codcliente : char(12)
+  nomcliente : varchar
+}
+
+entity "usuarios_homebanking" as uh {
+  * pkusuario : int <<PK>>
+  --
+  pkcliente : int <<FK>>
+  username : varchar
+  password_hash : varchar
+  intentos_fallidos : smallint
+  bloqueado : char(1)
+  activo : char(1)
+  ultimo_acceso : timestamp
+}
+
+entity "dcuentaahorro" as dca {
+  * pkcuentaahorro : int <<PK>>
+  --
+  codcuentaahorro : varchar
+  pkcliente : int <<FK>>
+}
+
+entity "fcuentaahorro" as fca {
+  * periododia : int <<PK,FK>>
+  * pkcuentaahorro : int <<PK,FK>>
+  --
+  pktipocuentaahorro : int <<FK>>
+  pkmoneda : int <<FK>>
+  pkestadocuenta : int <<FK>>
+  pkagencia : int
+  montosaldocapitaltotal : numeric
+  tasaefectivaanual : numeric
+  .. campos PF/CTS/AP ..
+  montosaldocapital_pf, tasapagada_pf
+  montocapital_cts, montocapitalintangible_cts
+  montocuota_ap, nrocuota_ap, fechavigencia_ap
+}
+
+entity "fcuentaahorroprogramado" as fcap {
+  * pkcuentaahorro : int <<PK,FK>>
+  * coddeposito : varchar <<PK>>
+  --
+  fechadepositocuota : date
+  fechaefectuadocuota : date
+  montocuota : numeric
+  montoamortizado : numeric
+  codestadocuota : char
+}
+
+entity "foperaciones" as fop {
+  * pkoperacion : bigint <<PK>>
+  --
+  codtipkar : char(2)
+  codkardex : varchar(20) <<unique>>
+  codtipoegresoingreso : char(1)
+  periododia : int <<FK dtiempo>>
+  pkconceptooperacion : int <<FK>>
+  pktipooperacion : int <<FK>>
+  pkmoneda : int <<FK>>
+  pkagenciaorigen : int
+  pkcuentaahorro : int <<FK>>
+  pkcuentacredito : int <<FK>>
+  montooperacion : numeric
+}
+
+entity "dcuentacredito" as dcc {
+  * pkcuentacredito : int <<PK>>
+  --
+  codcuentacredito : varchar
+  pkcliente : int <<FK>>
+}
+
+entity "fagcuentacredito" as fagcc {
+  * periodomes : int <<PK,FK>>
+  * pkcuentacredito : int <<PK,FK>>
+  --
+  pkcliente : int <<FK>>
+  montosaldocapital : numeric
+  montosaldocliente : numeric
+  diasatrasocredito : int
+  fechadesembolsocredito : date
+  pkcalificacioncrediticiainterna : int <<FK>>
+  pkagencia : int
+  pkmoneda : int
+}
+
+entity "fplanpagomes" as fpm {
+  * periodomes : int <<PK>>
+  * pkcuentacredito : int <<PK,FK>>
+  * nrocuota : int <<PK>>
+  --
+  montocuota : numeric
+  montosaldo : numeric
+  montocapitalpagado : numeric
+  fechavencimientopagocuota : date
+  fechapagocuota : date
+  diasatrasocuota : int
+  codestadocuota : char
+}
+
+entity "dsolicitud" as dsol {
+  * pksolicitud : int <<PK>>
+  --
+  codsolicitud : varchar
+  pkcliente : int <<FK>>
+  pksolicitudestado : int <<FK>>
+  pkproducto : int <<FK>>
+  pkmoneda : int
+  montosolicitudcredito : numeric
+  plazosolicitudcredito : int
+  fechasolicitudcredito : date
+}
+
+entity "fclientefuenteingreso" as ffi {
+  * pkcliente : int <<PK,FK>>
+  * periodomes : int <<PK>>
+  --
+  montofuenteingreso : numeric
+  pkactividadeconomicacliente : int
+}
+
+' --- Catálogos (referenciados por código) ---
+entity "Catálogos" as cat {
+  dtipocuentaahorro, destadocuenta, dmoneda
+  dtipooperacion, dconceptooperacion
+  dmediopago, dcanaltransaccional
+  dcondicioncontable, dcalificacioncrediticia
+  dproducto, dsolicitudestado
+  dactividadeconomica, dtiempo
+}
+
+dcliente ||--o{ uh
+dcliente ||--o{ dca
+dca ||--o{ fca
+dca ||--o{ fcap
+dca ||--o{ fop
+dcliente ||--o{ dcc
+dcc ||--o{ fagcc
+dcc ||--o{ fpm
+dcc ||--o{ fop
+dcliente ||--o{ dsol
+dcliente ||--o{ ffi
+fop ..> cat
+fca ..> cat
+fagcc ..> cat
+dsol ..> cat
+
+@enduml

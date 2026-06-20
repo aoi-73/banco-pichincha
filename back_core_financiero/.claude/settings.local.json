@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(venv/Scripts/python.exe -c \"print\\(open\\('_cols.txt',encoding='utf-8'\\).read\\(\\)\\)\")",
+      "Bash(venv/Scripts/python.exe -c 'import urllib.request,urllib.error; *)",
+      "Bash(venv/Scripts/python.exe -c ' *)",
+      "Bash(rm -f _c2.txt)",
+      "Read(//d/GuillEdu/FrontEnd/react/banco_andino_front_fastapi/**)",
+      "Bash(venv/Scripts/python.exe scripts/setup_dpersonalasesor.py)",
+      "Bash(venv/Scripts/python.exe scripts/seed_homebanking.py)",
+      "Bash(venv/Scripts/python.exe scripts/seed_dtiempo.py)",
+      "Bash(venv/Scripts/python.exe scripts/seed_evaluaciones.py)",
+      "Bash(venv/Scripts/python.exe scripts/test_flujo_e2e.py)"
+    ]
+  }
+}

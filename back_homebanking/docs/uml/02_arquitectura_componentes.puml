@@ -1,0 +1,92 @@
+@startuml arquitectura_componentes
+' Diagrama de Componentes / Arquitectura en capas
+skinparam componentStyle rectangle
+title Homebanking Banca Internet Banco Andino — Arquitectura en capas
+
+actor "Cliente" as Cli
+
+node "Frontend (React + Vite :5174)" as FE {
+  [Páginas + Componentes BBVA] as UI
+  [services/* (axios hbApi + JWT)] as SVC
+}
+
+node "Backend FastAPI (:8002)" as BE {
+  [main.py\n(CORS, routers, /)] as MAIN
+
+  package "core" {
+    [cfg_config (.env)] as CFG
+    [cfg_database (engine + get_db)] as DB
+    [cfg_security (bcrypt + JWT)] as SEC
+    [cfg_auth (get_cliente)] as AUTH
+  }
+  package "routes" {
+    [route_auth] as RA
+    [route_cuentas] as RC
+    [route_operaciones] as RO
+    [route_creditos] as RCr
+  }
+  package "controllers" {
+    [ctrl_auth] as CA
+    [ctrl_cuentas] as CC
+    [ctrl_operaciones] as CO
+    [ctrl_creditos] as CCr
+  }
+  package "repositories" {
+    [repo_auth] as PA
+    [repo_cuentas] as PC
+    [repo_operaciones] as PO
+    [repo_creditos] as PCr
+    [repo_catalogos] as PCat
+  }
+  package "schemas (pydantic)" {
+    [sch_auth / sch_cuentas /\nsch_operaciones / sch_creditos] as SCH
+  }
+}
+
+database "PostgreSQL\nbd_core_financiero\n(compartida con el core)" as PG
+
+Cli --> UI
+UI --> SVC
+SVC --> MAIN : HTTPS/JSON\nBearer JWT (CORS 5174)
+
+MAIN --> RA
+MAIN --> RC
+MAIN --> RO
+MAIN --> RCr
+
+RA --> CA
+RC --> CC
+RO --> CO
+RCr --> CCr
+
+RA ..> AUTH : (login: no)\notros: get_cliente
+RC ..> AUTH
+RO ..> AUTH
+RCr ..> AUTH
+AUTH ..> SEC : decodifica JWT
+
+CA --> PA
+CC --> PC
+CO --> PO
+CO --> PC
+CCr --> PCr
+CA ..> SEC : bcrypt / crear token
+
+PO ..> PCat : resuelve PK por código
+PCr ..> PCat
+
+PA --> DB
+PC --> DB
+PO --> DB
+PCr --> DB
+PCat --> DB
+DB --> PG : SQL text() (sin ORM)
+
+RA ..> SCH
+RC ..> SCH
+RO ..> SCH
+RCr ..> SCH
+CFG ..> DB
+CFG ..> SEC
+
+@enduml

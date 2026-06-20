@@ -1,0 +1,1222 @@
+:root {
+  /* Paleta de marca Banco Pichincha */
+  --hb-red: #0F265C;            /* Primary brand color: deep blue */
+  --hb-red-dark: #0a1b41;       /* Darker version for hovers */
+  --hb-red-light: #f0f4fc;      /* Light blue tint for background/hovers */
+  --hb-magenta: #E8C496;        /* Secondary Accent: Gold Sand */
+  --hb-turquesa: #FFDD00;       /* Primary Accent: Yellow */
+  --hb-naranja: #e8b87d;        /* warm sandy orange */
+  --hb-amarillo: #FFDD00;       /* Primary Accent: Yellow */
+  --hb-verde-t: #10b981;        /* Success green */
+  --hb-morado: #2a4c9b;         /* indigo blue */
+
+  --hb-bg: #f4f6fa;             /* clean modern background */
+  --hb-text: #0c1b3f;           /* deep corporate blue for text */
+  --hb-muted: #5a6b8c;          /* slate/gray-blue muted text */
+  --hb-border: #dbe2ef;         /* light corporate border */
+  --hb-green: #10b981;
+  --hb-amber: #f59e0b;
+  --hb-shadow: 0 1px 3px rgba(15, 38, 92, 0.08), 0 2px 8px rgba(15, 38, 92, 0.06);
+  --hb-radius: 12px;
+
+  /* Gradiente y franja de la marca */
+  --hb-grad: linear-gradient(110deg, #0F265C, #183d91 60%, #0F265C);
+  --hb-grad-login: linear-gradient(135deg, #0F265C, #183d91 50%, #0F265C);
+  --hb-franja: repeating-linear-gradient(
+    90deg,
+    #0F265C 0 20px,
+    #FFDD00 20px 40px
+  );
+}
+
+/* Franja tejida superior reutilizable */
+.hb-franja-top {
+  height: 6px;
+  background: var(--hb-franja);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--hb-text);
+  background: var(--hb-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ====== Layout ====== */
+.hb-main {
+  min-height: calc(100vh - 132px);
+}
+.hb-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 18px 48px;
+}
+
+.hb-page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--hb-red);
+  margin: 0 0 4px;
+}
+.hb-page-sub {
+  color: var(--hb-muted);
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+.hb-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 22px 0 10px;
+  color: #374151;
+}
+
+/* ====== Header ====== */
+.hb-header {
+  background: var(--hb-grad);
+  color: #fff;
+  box-shadow: var(--hb-shadow);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.hb-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 12px 18px;
+}
+.hb-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.3px;
+}
+.hb-logo-badge {
+  background: #fff;
+  color: var(--hb-red);
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+}
+.hb-logo small {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+}
+.hb-header-user {
+  text-align: right;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.hb-header-user strong { font-size: 14px; }
+.hb-header-user .hb-clock {
+  opacity: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Menú horizontal de íconos circulares */
+.hb-menu {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 6px 18px 14px;
+}
+.hb-menu-item {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  transition: background 0.15s;
+  min-width: 96px;
+}
+.hb-menu-item:hover { background: rgba(255,255,255,0.12); }
+.hb-menu-item.active { background: rgba(255,255,255,0.18); }
+.hb-menu-circle {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--hb-red);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.hb-menu-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+/* Dropdown */
+.hb-menu-wrap { position: relative; }
+.hb-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: var(--hb-text);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  min-width: 220px;
+  padding: 6px;
+  z-index: 60;
+  border: 1px solid var(--hb-border);
+}
+.hb-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--hb-text);
+}
+.hb-dropdown button:hover { background: var(--hb-red-light); color: var(--hb-red-dark); }
+
+/* ====== Card ====== */
+.hb-card {
+  background: #fff;
+  border-radius: var(--hb-radius);
+  box-shadow: var(--hb-shadow);
+  border: 1px solid var(--hb-border);
+  padding: 20px;
+}
+.hb-card + .hb-card { margin-top: 16px; }
+.hb-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 14px;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ====== Tabla ====== */
+.hb-table-wrap { overflow-x: auto; }
+.hb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.hb-table th {
+  text-align: left;
+  background: #fafafa;
+  color: var(--hb-muted);
+  font-weight: 600;
+  padding: 11px 12px;
+  border-bottom: 2px solid var(--hb-border);
+  white-space: nowrap;
+}
+.hb-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--hb-border);
+  vertical-align: middle;
+}
+.hb-table tbody tr:hover { background: #fcfcfd; }
+.hb-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.hb-table-empty {
+  text-align: center;
+  color: var(--hb-muted);
+  padding: 28px 12px;
+}
+
+/* ====== Botones ====== */
+.hb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 9px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--hb-red);
+  color: #fff;
+  transition: background 0.15s, opacity 0.15s;
+}
+.hb-btn:hover { background: var(--hb-red-dark); }
+.hb-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.hb-btn-sm { padding: 6px 11px; font-size: 12.5px; border-radius: 7px; }
+.hb-btn-ghost {
+  background: #fff;
+  color: var(--hb-red);
+  border: 1px solid var(--hb-red);
+}
+.hb-btn-ghost:hover { background: var(--hb-red-light); }
+.hb-btn-gray {
+  background: #eef0f3;
+  color: #374151;
+}
+.hb-btn-gray:hover { background: #e2e6ea; }
+
+/* ====== Badges de estado ====== */
+.hb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.hb-badge-green { background: #e6f4ea; color: var(--hb-green); }
+.hb-badge-red { background: #fdeaea; color: var(--hb-red); }
+.hb-badge-amber { background: #fef3e2; color: var(--hb-amber); }
+.hb-badge-gray { background: #eef0f3; color: #4b5563; }
+
+/* ====== Money ====== */
+.hb-money { font-variant-numeric: tabular-nums; font-weight: 600; }
+.hb-money-pos { color: var(--hb-green); }
+.hb-money-neg { color: var(--hb-red); }
+
+/* ====== Forms ====== */
+.hb-field { margin-bottom: 16px; }
+.hb-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #374151;
+}
+.hb-input, .hb-select {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--hb-border);
+  border-radius: 9px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  transition: border 0.15s, box-shadow 0.15s;
+}
+.hb-input:focus, .hb-select:focus {
+  outline: none;
+  border-color: var(--hb-red);
+  box-shadow: 0 0 0 3px rgba(15,38,92,0.15);
+}
+.hb-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 18px;
+}
+@media (max-width: 560px) {
+  .hb-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ====== Mensajes ====== */
+.hb-alert {
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.hb-alert-error { background: #fdeaea; color: var(--hb-red-dark); border: 1px solid #f6c5c8; }
+.hb-alert-info { background: #eef4ff; color: #1d4ed8; border: 1px solid #cdddff; }
+.hb-alert-success { background: #e6f4ea; color: var(--hb-green); border: 1px solid #bfe3c8; }
+.hb-alert-warn { background: #fef3e2; color: var(--hb-amber); border: 1px solid #f6dcae; }
+
+/* ====== Loader ====== */
+.hb-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 0;
+  color: var(--hb-muted);
+}
+.hb-spinner {
+  width: 38px; height: 38px;
+  border: 4px solid var(--hb-red-light);
+  border-top-color: var(--hb-red);
+  border-radius: 50%;
+  animation: hb-spin 0.8s linear infinite;
+}
+@keyframes hb-spin { to { transform: rotate(360deg); } }
+
+/* ====== Login ====== */
+.hb-login-bg {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: var(--hb-grad-login);
+  position: relative;
+}
+.hb-login-bg::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 8px;
+  background: var(--hb-franja);
+}
+.hb-login-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.3);
+  padding: 32px 32px 36px;
+  width: 100%;
+  max-width: 400px;
+}
+.hb-login-franja {
+  height: 6px;
+  border-radius: 6px;
+  background: var(--hb-franja);
+  background-size: 80px;
+  margin-bottom: 22px;
+}
+.hb-login-head {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.hb-login-head .hb-logo-badge {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  font-size: 26px;
+  margin: 0 auto 12px;
+  background: var(--hb-red);
+  color: #fff;
+}
+.hb-login-head h1 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--hb-red);
+}
+.hb-login-head p {
+  margin: 4px 0 0;
+  color: var(--hb-muted);
+  font-size: 13px;
+}
+.hb-login-hint {
+  margin-top: 18px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--hb-muted);
+}
+
+/* ====== Home ====== */
+.hb-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 8px;
+}
+.hb-quick-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid var(--hb-border);
+  border-radius: var(--hb-radius);
+  box-shadow: var(--hb-shadow);
+  transition: transform 0.12s, box-shadow 0.12s;
+  text-align: left;
+  width: 100%;
+}
+.hb-quick-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(15,38,92,0.15); }
+.hb-quick-icon {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: var(--hb-red-light);
+  color: var(--hb-red);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.hb-quick-card h3 { margin: 0; font-size: 15px; }
+.hb-quick-card p { margin: 2px 0 0; font-size: 12.5px; color: var(--hb-muted); }
+
+/* ====== Detalle / definición ====== */
+.hb-dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+.hb-dl div { }
+.hb-dl dt { font-size: 12px; color: var(--hb-muted); margin-bottom: 2px; }
+.hb-dl dd { margin: 0; font-size: 15px; font-weight: 600; }
+
+.hb-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--hb-muted);
+  font-size: 13px;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 14px;
+}
+.hb-back:hover { color: var(--hb-red); }
+
+.hb-comprobante {
+  border: 2px dashed var(--hb-green);
+  border-radius: var(--hb-radius);
+  padding: 22px;
+  background: #f6fbf7;
+}
+.hb-comprobante h3 {
+  margin: 0 0 14px;
+  color: var(--hb-green);
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ============================================================
+   LANDING PÚBLICO (home marketero)
+   ============================================================ */
+.lp-page {
+  background: #fff;
+  min-height: 100vh;
+}
+
+/* ---- Header público ---- */
+.lp-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: #fff;
+  box-shadow: 0 1px 0 var(--hb-border), var(--hb-shadow);
+}
+.lp-nav {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.lp-brand { background: none; border: none; cursor: pointer; padding: 0; }
+.lp-nav-links {
+  display: flex;
+  gap: 22px;
+  margin-left: 18px;
+  flex: 1;
+}
+.lp-nav-links a {
+  color: var(--hb-text);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 2px;
+  border-bottom: 2px solid transparent;
+}
+.lp-nav-links a:hover { color: var(--hb-red); border-bottom-color: var(--hb-red); text-decoration: none; }
+.lp-nav-actions { display: flex; align-items: center; gap: 10px; }
+.lp-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--hb-red);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+}
+.lp-cta:hover { background: var(--hb-red-dark); }
+.lp-burger { display: none; background: none; border: none; color: var(--hb-text); }
+
+/* ---- Hero ---- */
+.lp-hero {
+  background: var(--hb-grad);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.lp-hero::after {
+  content: '';
+  position: absolute;
+  right: -120px; top: -120px;
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%);
+  border-radius: 50%;
+}
+.lp-hero-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 64px 20px 72px;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+.lp-hero-text { max-width: 720px; margin: 0 auto; }
+.lp-hero-actions { justify-content: center; }
+.lp-hero-text p { margin-left: auto; margin-right: auto; }
+.lp-hero-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.18);
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  margin-bottom: 16px;
+}
+.lp-hero-text h1 {
+  font-size: 42px;
+  line-height: 1.1;
+  margin: 0 0 16px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.lp-hero-text p {
+  font-size: 16.5px;
+  line-height: 1.6;
+  margin: 0 0 26px;
+  max-width: 520px;
+  opacity: 0.95;
+}
+.lp-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 12px 22px;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+}
+.lp-btn-light { background: #fff; color: var(--hb-red); }
+.lp-btn-light:hover { background: var(--hb-red-light); text-decoration: none; }
+.lp-btn-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.7); }
+.lp-btn-outline:hover { background: rgba(255,255,255,0.14); text-decoration: none; }
+.lp-btn-primary { background: var(--hb-red); color: #fff; }
+.lp-btn-primary:hover { background: var(--hb-red-dark); }
+
+/* ---- Widget de ingreso (tarjeta de ahorros) ---- */
+.lp-login-widget {
+  background: #fff;
+  color: var(--hb-text);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+.lp-login-widget-head {
+  background: var(--hb-text);
+  color: #fff;
+  padding: 14px 20px;
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lp-login-widget-body { padding: 22px 20px 20px; }
+.lp-login-widget-body label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 7px;
+}
+.lp-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--hb-border);
+  border-radius: 10px;
+  padding: 0 12px;
+  margin-bottom: 14px;
+  color: #9ca3af;
+}
+.lp-input-wrap:focus-within { border-color: var(--hb-red); box-shadow: 0 0 0 3px rgba(15,38,92,0.15); }
+.lp-input-wrap input {
+  border: none;
+  outline: none;
+  padding: 12px 0;
+  font-size: 15px;
+  width: 100%;
+  color: var(--hb-text);
+  background: transparent;
+}
+.lp-login-widget-hint {
+  font-size: 12px;
+  color: var(--hb-muted);
+  text-align: center;
+  margin: 14px 0 0;
+}
+
+/* ---- Barra de accesos rápidos ---- */
+.lp-quickbar {
+  max-width: 1180px;
+  margin: -28px auto 0;
+  padding: 0 20px;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.lp-quick {
+  background: #fff;
+  border: 1px solid var(--hb-border);
+  border-radius: 12px;
+  box-shadow: var(--hb-shadow);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--hb-text);
+  cursor: pointer;
+}
+.lp-quick:hover { border-color: var(--hb-red); color: var(--hb-red); }
+.lp-quick svg { color: var(--hb-red); }
+
+/* ---- Secciones ---- */
+.lp-section {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 64px 20px;
+}
+.lp-section-head { text-align: center; margin-bottom: 36px; }
+.lp-section-head h2 { font-size: 30px; margin: 0 0 8px; font-weight: 800; }
+.lp-section-head p { color: var(--hb-muted); margin: 0; font-size: 16px; }
+
+/* ---- Productos ---- */
+.lp-products {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.lp-product {
+  background: #fff;
+  border: 1px solid var(--hb-border);
+  border-radius: 16px;
+  padding: 26px 22px;
+  box-shadow: var(--hb-shadow);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.lp-product:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.10); }
+.lp-product-icon {
+  width: 54px; height: 54px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+}
+.lp-product h3 { margin: 0 0 8px; font-size: 18px; }
+.lp-product p { margin: 0 0 16px; color: var(--hb-muted); font-size: 14px; line-height: 1.55; }
+.lp-product-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--hb-red);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+}
+.lp-product-link:hover { gap: 9px; }
+
+/* ---- Promo ---- */
+.lp-promo {
+  background: var(--hb-grad-login);
+  color: #fff;
+}
+.lp-promo-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 44px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.lp-promo-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.2);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.lp-promo-inner h2 { margin: 0 0 8px; font-size: 26px; font-weight: 800; }
+.lp-promo-inner p { margin: 0; max-width: 560px; opacity: 0.95; line-height: 1.55; }
+
+/* ---- Beneficios ---- */
+.lp-benefits {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.lp-benefit { text-align: center; padding: 10px; }
+.lp-benefit-icon {
+  width: 60px; height: 60px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: var(--hb-red-light);
+  color: var(--hb-red);
+  display: grid;
+  place-items: center;
+}
+.lp-benefit h3 { margin: 0 0 6px; font-size: 17px; }
+.lp-benefit p { margin: 0; color: var(--hb-muted); font-size: 14px; line-height: 1.5; }
+
+/* ---- Footer ---- */
+.lp-footer { background: #1e1722; color: #d9d2dd; }
+.lp-footer-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 48px 20px 36px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr 1.2fr;
+  gap: 28px;
+}
+.lp-footer-brand p { font-size: 13.5px; line-height: 1.6; margin: 16px 0; max-width: 280px; }
+.lp-social { display: flex; gap: 10px; }
+.lp-social a {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+.lp-social a:hover { background: var(--hb-red); }
+.lp-footer-col h4 { margin: 0 0 14px; font-size: 14px; color: #fff; }
+.lp-footer-col ul { list-style: none; padding: 0; margin: 0; }
+.lp-footer-col li { margin-bottom: 9px; }
+.lp-footer-col a { color: #b8aebf; font-size: 13.5px; }
+.lp-footer-col a:hover { color: #fff; text-decoration: none; }
+.lp-contact li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #b8aebf; }
+.lp-footer-legal {
+  text-align: center;
+  padding: 16px;
+  font-size: 12.5px;
+  color: #9a90a1;
+}
+
+/* ---- Responsive landing ---- */
+@media (max-width: 900px) {
+  .lp-hero-inner { grid-template-columns: 1fr; }
+  .lp-hero-text h1 { font-size: 34px; }
+  .lp-nav-links { display: none; }
+  .lp-cta { display: none; }
+  .lp-burger { display: inline-flex; }
+  .lp-quickbar { grid-template-columns: repeat(2, 1fr); }
+  .lp-products { grid-template-columns: repeat(2, 1fr); }
+  .lp-benefits { grid-template-columns: repeat(2, 1fr); }
+  .lp-footer-inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .lp-quickbar { grid-template-columns: 1fr 1fr; }
+  .lp-products { grid-template-columns: 1fr; }
+  .lp-benefits { grid-template-columns: 1fr; }
+  .lp-footer-inner { grid-template-columns: 1fr; }
+  .lp-hero-text h1 { font-size: 28px; }
+}
+
+/* ============================================================
+   APP AUTENTICADA — LAYOUT TIPO BBVA (colores Banco Andino)
+   ============================================================ */
+
+/* ---- Barra superior oscura ---- */
+.bbva-topbar {
+  background: linear-gradient(90deg, #0a1b41, #0F265C);
+  color: #fff;
+}
+.bbva-topbar-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.bbva-brand { background: none; border: none; cursor: pointer; padding: 0; }
+.bbva-topbar-right { display: flex; align-items: center; gap: 14px; }
+
+.bbva-hide-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: none;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.bbva-hide-toggle:hover { background: rgba(255,255,255,0.18); }
+.bbva-switch {
+  width: 34px; height: 18px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.35);
+  position: relative;
+  transition: background 0.15s;
+}
+.bbva-switch.on { background: var(--hb-turquesa); }
+.bbva-switch-dot {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s;
+}
+.bbva-switch.on .bbva-switch-dot { transform: translateX(16px); }
+
+.bbva-user-wrap { position: relative; }
+.bbva-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+.bbva-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--hb-turquesa);
+  color: #fff;
+  display: grid; place-items: center;
+  font-weight: 800;
+  font-size: 13px;
+}
+.bbva-user-text { display: flex; flex-direction: column; line-height: 1.2; text-align: left; }
+.bbva-user-text strong { font-size: 13px; }
+.bbva-user-text small { font-size: 11px; opacity: 0.85; }
+.bbva-user-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #fff;
+  color: var(--hb-text);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  min-width: 210px;
+  padding: 6px;
+  z-index: 70;
+}
+.bbva-user-menu button {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; text-align: left;
+  background: none; border: none;
+  padding: 10px 12px; border-radius: 8px;
+  font-size: 14px; color: var(--hb-text);
+}
+.bbva-user-menu button:hover { background: var(--hb-red-light); color: var(--hb-red-dark); }
+.bbva-salir {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.15);
+  color: #fff; border: none;
+  padding: 8px 14px; border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+}
+.bbva-salir:hover { background: rgba(255,255,255,0.28); }
+
+/* ---- Barra de pestañas ---- */
+.bbva-tabs {
+  background: var(--hb-red);
+  box-shadow: var(--hb-shadow);
+  position: sticky; top: 0; z-index: 40;
+}
+.bbva-tabs-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 12px;
+  display: flex;
+  gap: 2px;
+}
+.bbva-tab {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.88);
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 14px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+.bbva-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.bbva-tab.active { color: #fff; border-bottom-color: #fff; background: rgba(0,0,0,0.08); }
+
+/* ---- Contenedor ---- */
+.bbva-main { background: var(--hb-bg); min-height: calc(100vh - 120px); }
+.bbva-container { max-width: 1180px; margin: 0 auto; padding: 24px 20px 56px; }
+
+/* ---- Page layout 2 columnas ---- */
+.bbva-page { display: grid; grid-template-columns: 1fr 320px; gap: 22px; align-items: start; }
+.bbva-page-main { min-width: 0; }
+.bbva-page-aside { position: sticky; top: 76px; }
+.bbva-page-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.bbva-page-title { font-size: 24px; font-weight: 800; margin: 0 0 2px; color: #1f2430; }
+.bbva-page-sub { color: var(--hb-muted); margin: 0; font-size: 13.5px; }
+.bbva-page-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---- Botones ---- */
+.bbva-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--hb-red); color: #fff; border: none;
+  padding: 11px 20px; border-radius: 9px; font-size: 14px; font-weight: 700;
+  cursor: pointer;
+}
+.bbva-btn:hover { background: var(--hb-red-dark); }
+.bbva-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.bbva-btn-gray {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #eef0f3; color: #374151; border: none;
+  padding: 11px 20px; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.bbva-btn-gray:hover { background: #e2e6ea; }
+.bbva-btn-ghost {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #fff; color: var(--hb-red); border: 1px solid var(--hb-border);
+  padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.bbva-btn-ghost:hover { border-color: var(--hb-red); background: var(--hb-red-light); }
+.bbva-btn-ghost.sm { padding: 6px 11px; font-size: 12.5px; }
+.bbva-btn-ghost:disabled { opacity: 0.55; cursor: not-allowed; }
+.bbva-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: none; border: none; color: var(--hb-turquesa);
+  font-weight: 700; font-size: 13px; cursor: pointer;
+}
+.bbva-link:hover { text-decoration: underline; }
+
+/* ---- Panel de acciones (aside) ---- */
+.bbva-actions {
+  background: #fff; border: 1px solid var(--hb-border);
+  border-radius: var(--hb-radius); box-shadow: var(--hb-shadow);
+  overflow: hidden;
+}
+.bbva-actions-title {
+  margin: 0; padding: 14px 16px;
+  font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+  color: #fff; background: var(--hb-turquesa);
+}
+.bbva-actions-list { padding: 6px; }
+.bbva-action {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  background: none; border: none; cursor: pointer;
+  padding: 11px 12px; border-radius: 9px; text-align: left;
+  font-size: 13.5px; font-weight: 600; color: var(--hb-text);
+}
+.bbva-action:hover { background: var(--hb-bg); }
+.bbva-action-ico {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: #e6f7f6; color: var(--hb-turquesa);
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.bbva-action-label { flex: 1; }
+.bbva-action-chev { color: var(--hb-muted); }
+
+/* ---- Inicio: saludo + KPIs ---- */
+.bbva-hello h1 { font-size: 22px; margin: 0 0 4px; color: #1f2430; }
+.bbva-hello p { margin: 0 0 18px; color: var(--hb-muted); font-size: 14px; }
+.bbva-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+.bbva-kpi {
+  background: #fff; border: 1px solid var(--hb-border); border-left: 4px solid var(--hb-red);
+  border-radius: var(--hb-radius); box-shadow: var(--hb-shadow);
+  padding: 16px 18px; display: flex; gap: 14px; align-items: center;
+}
+.bbva-kpi:nth-child(2) { border-left-color: var(--hb-turquesa); }
+.bbva-kpi-ico { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; }
+.bbva-kpi-label { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--hb-muted); text-transform: uppercase; letter-spacing: 0.3px; }
+.bbva-kpi-val { display: block; font-size: 25px; font-weight: 800; margin: 3px 0; }
+.bbva-kpi small { color: var(--hb-muted); font-size: 12px; }
+
+/* ---- Listas de productos (resumen) ---- */
+.bbva-prodlist { list-style: none; padding: 0; margin: 0; }
+.bbva-prodlist li {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 6px; border-bottom: 1px solid var(--hb-border); cursor: pointer;
+}
+.bbva-prodlist li:hover { background: #fcfcfd; }
+.bbva-prod-info { display: flex; flex-direction: column; gap: 3px; }
+.bbva-prod-info small { color: var(--hb-muted); font-size: 12.5px; display: flex; align-items: center; gap: 6px; }
+.bbva-prod-amt { display: flex; align-items: center; gap: 8px; color: var(--hb-muted); }
+.bbva-prodlist-total {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 6px; cursor: default;
+  font-size: 13.5px; color: var(--hb-muted);
+}
+.bbva-prodlist-total:hover { background: none; }
+.bbva-money-strong { font-size: 17px; font-weight: 800; color: var(--hb-red); }
+.bbva-empty { text-align: center; color: var(--hb-muted); padding: 22px 10px; margin: 0; }
+.bbva-cell-prod { display: flex; flex-direction: column; }
+.bbva-cell-prod small { color: var(--hb-muted); font-size: 11px; }
+
+/* ---- Cuentas de ahorro (acordeón) ---- */
+.bbva-acc-list { display: flex; flex-direction: column; }
+.bbva-acc { border-bottom: 1px solid var(--hb-border); }
+.bbva-acc.open { background: #fcfbfc; border-radius: 10px; }
+.bbva-acc-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; padding: 14px 8px; flex-wrap: wrap;
+}
+.bbva-acc-main { display: flex; align-items: center; gap: 12px; }
+.bbva-acc-ico {
+  width: 42px; height: 42px; border-radius: 10px;
+  background: var(--hb-red-light); color: var(--hb-red);
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.bbva-acc-main strong { display: block; font-size: 15px; }
+.bbva-acc-main small { color: var(--hb-muted); font-size: 12.5px; }
+.bbva-acc-right { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.bbva-acc-saldo { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.bbva-acc-saldo .hb-money { font-size: 17px; font-weight: 800; }
+.bbva-acc-btns { display: flex; gap: 8px; }
+.bbva-chev { transition: transform 0.15s; }
+.bbva-chev.up { transform: rotate(180deg); }
+
+.bbva-detalle {
+  padding: 16px 12px 18px; margin: 0 4px 8px;
+  border-top: 1px dashed var(--hb-border);
+}
+.bbva-detalle-title { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 14px; color: var(--hb-red); }
+.bbva-detalle-sub { margin: 16px 0 8px; font-size: 13px; color: #374151; }
+.bbva-cts-disp {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 14px; padding: 12px 14px;
+  background: #e6f7f6; border: 1px solid #b8e6e4; border-radius: 10px;
+}
+.bbva-cts-disp span { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #0c6b68; font-size: 13.5px; }
+.bbva-cts-disp .bbva-money-strong { color: var(--hb-turquesa); }
+
+/* ---- Operaciones hub ---- */
+.bbva-op-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.bbva-op-card {
+  display: flex; align-items: center; gap: 16px;
+  background: #fff; border: 1px solid var(--hb-border);
+  border-radius: var(--hb-radius); box-shadow: var(--hb-shadow);
+  padding: 20px; cursor: pointer; text-align: left;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.bbva-op-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,0.10); }
+.bbva-op-ico { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; }
+.bbva-op-body { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.bbva-op-body strong { font-size: 16px; }
+.bbva-op-body small { color: var(--hb-muted); font-size: 13px; line-height: 1.45; }
+.bbva-op-chev { color: var(--hb-muted); flex-shrink: 0; }
+
+/* ---- Formularios / confirmación ---- */
+.hb-field-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #374151; }
+.bbva-saldo-hint { font-size: 13px; color: var(--hb-muted); margin: -4px 0 14px; }
+.bbva-field-note { display: block; color: var(--hb-muted); font-size: 12px; margin-top: 5px; }
+.bbva-form-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.bbva-confirm-lead { font-size: 14px; font-weight: 600; margin: 0 0 14px; }
+.bbva-info-note {
+  background: #eef4ff; border: 1px solid #cdddff; color: #1d4ed8;
+  border-radius: 8px; padding: 10px 12px; font-size: 12.5px; margin: 16px 0;
+}
+.bbva-cuota-box {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: var(--hb-bg); border: 1px solid var(--hb-border);
+  border-radius: 10px; padding: 14px 16px; margin: 4px 0 16px;
+}
+.bbva-cuota-box > span { color: var(--hb-muted); font-size: 13px; }
+.bbva-cuota-box .bbva-money-strong { margin-left: auto; font-size: 18px; }
+
+/* ---- Servicios (grid de empresas) ---- */
+.bbva-serv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.bbva-serv {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1.5px solid var(--hb-border); border-radius: 10px;
+  padding: 11px 12px; cursor: pointer; text-align: left;
+}
+.bbva-serv:hover { border-color: var(--hb-turquesa); }
+.bbva-serv.sel { border-color: var(--hb-red); background: var(--hb-red-light); }
+.bbva-serv-ico { width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0; }
+.bbva-serv span:last-child { display: flex; flex-direction: column; }
+.bbva-serv strong { font-size: 13px; }
+.bbva-serv small { color: var(--hb-muted); font-size: 11.5px; }
+
+/* ---- Comprobante ---- */
+.bbva-comprobante-card {
+  background: #fff; border: 1px solid var(--hb-border);
+  border-radius: var(--hb-radius); box-shadow: var(--hb-shadow);
+  padding: 22px; border-top: 5px solid var(--hb-green);
+}
+.bbva-comprobante-head { display: flex; align-items: flex-start; gap: 14px; }
+.bbva-comprobante-check { color: var(--hb-green); flex-shrink: 0; }
+.bbva-comprobante-head h3 { margin: 0; font-size: 18px; color: var(--hb-green); }
+.bbva-comprobante-head p { margin: 3px 0 0; color: var(--hb-muted); font-size: 13.5px; }
+.bbva-print {
+  margin-left: auto; background: var(--hb-bg); border: 1px solid var(--hb-border);
+  border-radius: 8px; padding: 8px; color: var(--hb-muted); cursor: pointer;
+}
+.bbva-print:hover { color: var(--hb-red); border-color: var(--hb-red); }
+.bbva-comprobante-sim {
+  background: #fef3e2; border: 1px solid #f6dcae; color: var(--hb-amber);
+  border-radius: 8px; padding: 9px 12px; font-size: 12.5px; margin: 14px 0 0;
+}
+.bbva-comprobante-rows {
+  margin: 18px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+.bbva-comprobante-rows dt { font-size: 12px; color: var(--hb-muted); margin-bottom: 2px; }
+.bbva-comprobante-rows dd { margin: 0; font-size: 15px; font-weight: 600; }
+.bbva-comprobante-nota { margin: 16px 0 0; font-size: 12.5px; color: var(--hb-muted); }
+
+/* ---- Responsive app ---- */
+@media (max-width: 900px) {
+  .bbva-page { grid-template-columns: 1fr; }
+  .bbva-page-aside { position: static; }
+  .bbva-kpis { grid-template-columns: 1fr; }
+  .bbva-op-grid { grid-template-columns: 1fr; }
+  .bbva-serv-grid { grid-template-columns: 1fr 1fr; }
+  .bbva-comprobante-rows { grid-template-columns: 1fr; }
+  .bbva-salir { display: none; }
+}
+@media (max-width: 560px) {
+  .bbva-hide-toggle span:not(.bbva-switch):not(.bbva-switch-dot) { display: none; }
+  .bbva-user-text { display: none; }
+  .bbva-serv-grid { grid-template-columns: 1fr; }
+  .bbva-tab { padding: 12px 14px; font-size: 13.5px; }
+}

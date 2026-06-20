@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(venv/Scripts/python.exe -c ' *)",
+      "Bash(cd \"d:/GuillEdu/BackEnd/FastAPI/backend_core_banco_andino_fastapi\" && rm -f _rev.txt; echo limpio)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(venv/Scripts/python.exe _probe.py)",
+      "Bash(venv/Scripts/python.exe scripts/setup_dpersonalcargo.py)"
+    ]
+  }
+}

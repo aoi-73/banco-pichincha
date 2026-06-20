@@ -1,0 +1,222 @@
+@startuml diagrama_clases
+' Diagrama de Clases - DTOs (schemas) y módulos de las capas
+skinparam classAttributeIconSize 0
+title Homebanking Banca Internet Banco Andino — Clases (schemas) y módulos por capa
+
+' ===================== SCHEMAS / DTOs =====================
+package "schemas (pydantic)" {
+
+  class LoginRequest {
+    +username: str
+    +password: str
+  }
+  class LoginResponse {
+    +access_token: str
+    +token_type: str
+    +expires_in_min: int
+    +cliente: ClienteInfo
+  }
+  class ClienteInfo {
+    +codcliente: str
+    +nombre: str
+    +pkcliente: int
+  }
+
+  class CuentaAhorroOut {
+    +codcuentaahorro: str
+    +tipo: str
+    +saldo: Decimal
+    +estado: str
+    +moneda: str
+    +tea: Decimal
+  }
+  class DetalleAhorroResponse {
+    +codcuentaahorro: str
+    +tipo: str
+    +codtipo: str
+    +plazo_fijo: PlazoFijoDetalle
+    +cts: CtsDetalle
+    +ahorro_programado: AhorroProgramadoDetalle
+    +mensaje: str
+  }
+  class PlazoFijoDetalle {
+    +fecha_vigencia: date
+    +nro_dias_plazo: int
+    +saldo_capital: Decimal
+    +interes_pactado: Decimal
+    +interes_devengado: Decimal
+    +interes_pagado: Decimal
+    +tasa_pagada: Decimal
+    +nro_renovaciones: int
+  }
+  class CtsDetalle {
+    +capital: Decimal
+    +interes: Decimal
+    +capital_intangible: Decimal
+    +interes_intangible: Decimal
+    +disponible: Decimal
+  }
+  class AhorroProgramadoDetalle {
+    +capital: Decimal
+    +monto_cuota: Decimal
+    +nro_cuotas: int
+    +tasa_incentivo: Decimal
+    +fecha_vigencia: date
+    +cronograma: List<DepositoProgramadoOut>
+  }
+  class DepositoProgramadoOut {
+    +coddeposito: str
+    +fecha_programada: date
+    +fecha_efectuada: date
+    +monto_cuota: Decimal
+    +monto_amortizado: Decimal
+    +dias_retraso: int
+    +estado: str
+    +depositada: bool
+  }
+  class MovimientoOut {
+    +fecha: date
+    +concepto: str
+    +canal: str
+    +medio: str
+    +monto: Decimal
+    +signo: str
+  }
+  class CuentaCreditoOut {
+    +codcuentacredito: str
+    +fecha_desembolso: date
+    +saldo_capital: Decimal
+    +pago_pendiente: Decimal
+    +dias_atraso: int
+    +calificacion: str
+  }
+  class CuotaOut {
+    +nrocuota: int
+    +fecha_vencimiento: date
+    +monto_cuota: Decimal
+    +monto_saldo: Decimal
+    +dias_atraso: int
+    +estado: str
+    +pagada: bool
+  }
+  class TransferenciaRequest {
+    +cuenta_origen: str
+    +cuenta_destino: str
+    +monto: Decimal
+  }
+  class PagoCuotaRequest {
+    +codcuentacredito: str
+    +monto: Decimal
+    +cuenta_origen: str
+  }
+  class PagoServicioRequest {
+    +cuenta_origen: str
+    +codservicio: str
+    +codsuministro: str
+    +monto: Decimal
+  }
+  class ServicioOut {
+    +codservicio: str
+    +nombre: str
+  }
+  class SolicitudCreditoRequest {
+    +montosolicitud: Decimal
+    +plazo: int
+    +codtipocredito: str  (ME|CO)
+    +codactividadeconomica: str
+    +montoingresoneto: Decimal
+  }
+}
+
+LoginResponse *-- ClienteInfo
+DetalleAhorroResponse *-- PlazoFijoDetalle
+DetalleAhorroResponse *-- CtsDetalle
+DetalleAhorroResponse *-- AhorroProgramadoDetalle
+AhorroProgramadoDetalle *-- DepositoProgramadoOut
+
+' ===================== CONTROLLERS =====================
+package "controllers" {
+  class ctrl_auth <<module>> {
+    +login(conn, username, password): dict
+  }
+  class ctrl_cuentas <<module>> {
+    +listar_ahorros(conn, pkcliente)
+    +detalle_ahorro(conn, pkcliente, cod)
+    +movimientos_ahorro(conn, pkcliente, cod, limit)
+    +listar_creditos(conn, pkcliente)
+    +cuotas_credito(conn, pkcliente, cod)
+  }
+  class ctrl_operaciones <<module>> {
+    +transferencia(conn, pkcliente, origen, destino, monto)
+    +pago_cuota(conn, pkcliente, codcredito, monto, cuenta_origen)
+    +listar_servicios()
+    +pago_servicio(conn, pkcliente, origen, codservicio, codsuministro, monto)
+  }
+  class ctrl_creditos <<module>> {
+    +solicitar(conn, pkcliente, monto, plazo, tipo, actividad, ingreso)
+  }
+}
+
+' ===================== REPOSITORIES =====================
+package "repositories" {
+  class repo_auth <<module>> {
+    +buscar_usuario_por_username()
+    +registrar_login_exitoso()
+    +registrar_login_fallido()
+  }
+  class repo_cuentas <<module>> {
+    +listar_ahorros() / buscar_cuenta_ahorro()
+    +detalle_subproducto_ahorro()
+    +cronograma_ahorro_programado()
+    +listar_movimientos()
+    +listar_creditos() / buscar_cuenta_credito()
+    +listar_cuotas()
+  }
+  class repo_operaciones <<module>> {
+    +insertar_operacion()
+    +mover_saldo_ahorro()
+    +pagar_cuota()
+    +transferir()
+    +pagar_servicio()
+  }
+  class repo_creditos <<module>> {
+    +crear_solicitud()
+    +upsert_fuente_ingreso()
+  }
+  class repo_catalogos <<module>> {
+    +resolver_pk(tabla, codigo)
+  }
+}
+
+' ===================== CORE =====================
+package "core" {
+  class cfg_security <<module>> {
+    +verificar_password()
+    +hashear_password()
+    +crear_access_token()
+    +decodificar_token()
+  }
+  class cfg_auth <<module>> {
+    +get_cliente(): payload
+  }
+  class cfg_database <<module>> {
+    +engine
+    +get_db()
+  }
+}
+
+ctrl_auth ..> repo_auth
+ctrl_auth ..> cfg_security
+ctrl_cuentas ..> repo_cuentas
+ctrl_operaciones ..> repo_operaciones
+ctrl_operaciones ..> repo_cuentas
+ctrl_creditos ..> repo_creditos
+repo_operaciones ..> repo_catalogos
+repo_creditos ..> repo_catalogos
+cfg_auth ..> cfg_security
+repo_auth ..> cfg_database
+repo_cuentas ..> cfg_database
+repo_operaciones ..> cfg_database
+repo_creditos ..> cfg_database
+
+@enduml

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/GuillEdu/BackEnd/FastAPI/backend_core_banco_andino_fastapi/app/repositories/**)",
+      "Bash(cd /d/GuillEdu/BackEnd/FastAPI/backend_core_banco_andino_fastapi)",
+      "Bash(sed -n '40,120p' app/controllers/ctl_dashboard.py)",
+      "Bash(sed -n '1,40p' app/controllers/ctl_dashboard.py)"
+    ]
+  }
+}

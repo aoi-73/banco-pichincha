@@ -1,0 +1,178 @@
+' ============================================================
+' Diagramas de SECUENCIA de los flujos clave del Homebanking
+' (este archivo contiene 5 diagramas; en VS Code/PlantUML se
+'  previsualiza aquel donde esté el cursor)
+' ============================================================
+
+@startuml sec_login
+title Secuencia — Iniciar sesión (POST /auth/login)
+actor Cliente
+participant "Frontend\n(React)" as FE
+participant "route_auth" as R
+participant "ctrl_auth" as C
+participant "repo_auth" as Repo
+participant "cfg_security\n(bcrypt/JWT)" as Sec
+database "bd_core_financiero" as DB
+
+Cliente -> FE : usuario + clave
+FE -> R : POST /auth/login {username, password}
+R -> C : login(conn, username, password)
+C -> Repo : buscar_usuario_por_username()
+Repo -> DB : SELECT usuarios_homebanking JOIN dcliente
+DB --> Repo : usuario (activo, bloqueado, hash)
+Repo --> C : usuario
+alt usuario inactivo / bloqueado
+  C --> FE : 403 (inactivo/bloqueado)
+else clave incorrecta
+  C -> Sec : verificar_password() = false
+  C -> Repo : registrar_login_fallido() (+1; 5 => bloquea)
+  C --> FE : 401 (intentos restantes)
+else credenciales válidas
+  C -> Sec : verificar_password() = true
+  C -> Repo : registrar_login_exitoso() (ultimo_acceso, reset intentos)
+  C -> Sec : crear_access_token({sub, tipo=cliente, pkcliente, nombre})
+  Sec --> C : JWT
+  C --> FE : 200 {access_token, cliente}
+end
+FE --> Cliente : sesión iniciada
+@enduml
+
+
+@startuml sec_pago_cuota_ahorro
+title Secuencia — Pagar crédito desde cuenta de ahorro (POST /operaciones/pago-cuota)
+actor Cliente
+participant "Frontend" as FE
+participant "cfg_auth\n(get_cliente)" as Auth
+participant "ctrl_operaciones" as C
+participant "repo_cuentas" as RC
+participant "repo_operaciones" as RO
+database "bd_core_financiero" as DB
+
+Cliente -> FE : elige crédito + cuenta de ahorro + monto
+FE -> Auth : POST /operaciones/pago-cuota (Bearer JWT)
+Auth -> Auth : decodifica JWT (tipo==cliente)
+Auth -> C : pago_cuota(pkcliente, codcredito, monto, cuenta_origen)
+C -> RC : buscar_cuenta_credito()
+RC -> DB : SELECT dcuentacredito + fagcuentacredito
+DB --> RC : credito
+alt crédito ajeno
+  C --> FE : 403
+end
+C -> RC : buscar_cuenta_ahorro(cuenta_origen)
+RC --> C : ahorro (saldo)
+alt cuenta de ahorro ajena
+  C --> FE : 403
+end
+C -> RO : pagar_cuota(credito, monto, origen)
+RO -> DB : SELECT próxima cuota (fechapagocuota IS NULL)
+alt sin cuotas pendientes
+  RO --> C : ValueError
+  C --> FE : 409 "sin cuotas pendientes"
+else saldo insuficiente
+  RO --> C : ValueError
+  C --> FE : 409 "saldo insuficiente"
+else OK
+  RO -> DB : UPDATE fplanpagomes (fechapagocuota=hoy)
+  RO -> DB : INSERT foperaciones (pago crédito, PCAP/E)
+  RO -> DB : INSERT foperaciones (débito ahorro, RAHO/E)
+  RO -> DB : UPDATE fcuentaahorro (saldo -= monto)
+  RO --> C : {nrocuota, monto_pagado, pkoperacion, pkoperacion_debito_ahorro, codkardex}
+  C --> FE : 200 comprobante
+  FE -> FE : recargar cuotas y saldos
+end
+@enduml
+
+
+@startuml sec_pago_servicio
+title Secuencia — Pago de servicios (GET /operaciones/servicios + POST /operaciones/pago-servicio)
+actor Cliente
+participant "Frontend" as FE
+participant "ctrl_operaciones" as C
+participant "repo_cuentas" as RC
+participant "repo_operaciones" as RO
+database "bd_core_financiero" as DB
+
+FE -> C : GET /operaciones/servicios
+C --> FE : [LUZ, AGUA, TEL, CABLE, GAS, MUNI]
+Cliente -> FE : servicio + suministro + cuenta + monto
+FE -> C : POST /operaciones/pago-servicio (Bearer JWT)
+alt servicio no válido
+  C --> FE : 400
+end
+C -> RC : buscar_cuenta_ahorro(cuenta_origen)
+RC -> DB : SELECT dcuentaahorro + fcuentaahorro
+DB --> RC : ahorro (saldo, pkcliente)
+alt cuenta ajena
+  C --> FE : 403
+else saldo insuficiente
+  C --> FE : 409
+else OK
+  C -> RO : pagar_servicio(origen, servicio, suministro, monto)
+  RO -> DB : INSERT foperaciones (PSER / PAG / APP / 'E')
+  RO -> DB : UPDATE fcuentaahorro (saldo -= monto)
+  RO --> C : {pkoperacion, codkardex}
+  C --> FE : 200 comprobante
+  FE -> FE : recargar saldos
+end
+@enduml
+
+
+@startuml sec_transferencia
+title Secuencia — Transferencia entre cuentas propias (POST /operaciones/transferencia)
+actor Cliente
+participant "Frontend" as FE
+participant "ctrl_operaciones" as C
+participant "repo_cuentas" as RC
+participant "repo_operaciones" as RO
+database "bd_core_financiero" as DB
+
+Cliente -> FE : cuenta origen + destino + monto
+FE -> C : POST /operaciones/transferencia (Bearer JWT)
+alt origen == destino
+  C --> FE : 400
+end
+C -> RC : buscar_cuenta_ahorro(origen) / (destino)
+RC --> C : cuentas (saldo, pkcliente)
+alt alguna cuenta ajena
+  C --> FE : 403
+else saldo insuficiente en origen
+  C --> FE : 409
+else OK
+  C -> RO : transferir(origen, destino, monto)
+  RO -> DB : INSERT foperaciones (débito origen, TRF/E)
+  RO -> DB : INSERT foperaciones (crédito destino, TRF/I)
+  RO -> DB : UPDATE fcuentaahorro origen (saldo -= monto)
+  RO -> DB : UPDATE fcuentaahorro destino (saldo += monto)
+  RO --> C : {pkoperacion_debito, pkoperacion_credito}
+  C --> FE : 200 comprobante
+end
+@enduml
+
+
+@startuml sec_solicitar_credito
+title Secuencia — Solicitar préstamo (POST /creditos/solicitar)
+actor Cliente
+participant "Frontend" as FE
+participant "ctrl_creditos" as C
+participant "repo_creditos" as R
+database "bd_core_financiero\n(Core)" as DB
+
+Cliente -> FE : monto, plazo, tipo (ME/CO), actividad, ingreso
+FE -> C : POST /creditos/solicitar (Bearer JWT)
+alt tipo != ME/CO
+  C --> FE : 400
+end
+C -> R : crear_solicitud(...)
+R -> DB : resolver pkproducto (ME->01 / CO->03)
+R -> DB : resolver actividad económica
+alt actividad inexistente
+  R --> C : ValueError
+  C --> FE : 400
+else OK
+  R -> DB : UPSERT fclientefuenteingreso (ON CONFLICT)
+  R -> DB : INSERT dsolicitud (estado "En Evaluación",\n codsolicitud = 'SOL'||LPAD(seq,7,'0'))
+  R --> C : {pksolicitud, codsolicitud}
+  C --> FE : 200 {estado: En Evaluación}
+  note right of DB : El Core evalúa la\n solicitud (fuera del portal)
+end
+@enduml

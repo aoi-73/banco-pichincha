@@ -1,0 +1,76 @@
+@startuml casos_de_uso
+' Diagrama de Casos de Uso - Homebanking Banca Internet Banco Andino
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+title Homebanking Banca Internet Banco Andino — Casos de Uso
+
+actor "Cliente" as Cli
+actor "Core Financiero\n(bd_core_financiero)" as Core
+
+rectangle "Homebanking — Portal del Cliente" {
+
+  usecase "Iniciar sesión" as UC01
+  usecase "Validar token (tipo=cliente)" as UC02
+
+  package "Consultas" {
+    usecase "Ver cuentas de ahorro" as UC03
+    usecase "Ver detalle PF/CTS/AP\n(+ cronograma AP)" as UC04
+    usecase "Ver movimientos" as UC05
+    usecase "Ver créditos" as UC06
+    usecase "Ver cronograma de cuotas" as UC07
+  }
+
+  package "Operaciones" {
+    usecase "Transferir entre cuentas propias" as UC08
+    usecase "Pagar crédito desde ahorro" as UC09
+    usecase "Consultar catálogo de servicios" as UC10
+    usecase "Pagar servicios desde ahorro" as UC11
+  }
+
+  package "Crédito" {
+    usecase "Solicitar préstamo (ME/CO)" as UC12
+  }
+
+  usecase "Validar saldo suficiente" as UCV
+  usecase "Validar pertenencia al cliente" as UCP
+}
+
+Cli --> UC01
+Cli --> UC03
+Cli --> UC04
+Cli --> UC05
+Cli --> UC06
+Cli --> UC07
+Cli --> UC08
+Cli --> UC09
+Cli --> UC10
+Cli --> UC11
+Cli --> UC12
+
+' Todas las consultas y operaciones requieren sesión válida
+UC03 ..> UC02 : <<include>>
+UC06 ..> UC02 : <<include>>
+UC08 ..> UC02 : <<include>>
+UC09 ..> UC02 : <<include>>
+UC11 ..> UC02 : <<include>>
+UC12 ..> UC02 : <<include>>
+
+' Reglas reutilizadas
+UC08 ..> UCV : <<include>>
+UC09 ..> UCV : <<include>>
+UC11 ..> UCV : <<include>>
+UC04 ..> UCP : <<include>>
+UC05 ..> UCP : <<include>>
+UC07 ..> UCP : <<include>>
+UC08 ..> UCP : <<include>>
+UC09 ..> UCP : <<include>>
+UC11 ..> UCP : <<include>>
+
+' El core recibe la solicitud y refleja las operaciones
+UC12 --> Core : solicitud (dsolicitud, "En Evaluación")
+UC08 --> Core : foperaciones / saldos
+UC09 --> Core : foperaciones / fplanpagomes
+UC11 --> Core : foperaciones / saldos
+
+@enduml
