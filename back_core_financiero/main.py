@@ -6,7 +6,7 @@ from app.routes import (
 )
 
 app = FastAPI(
-    title="Core Financiero — Banco Andino",
+    title="Core Financiero — Banco Pichincha",
     description="Motor de scoring, cartera crediticia y KPIs institucionales",
     version="1.0.0"
 )
@@ -30,7 +30,7 @@ app.include_router(rtr_recuperaciones.router, prefix="/recuperaciones", tags=["R
 
 @app.get("/")
 def root():
-    return {"sistema": "Core Financiero Banco Andino", "version": "1.0.0", "status": "ok"}
+    return {"sistema": "Core Financiero Banco Pichinchha", "version": "1.0.0", "status": "ok"}
 
 
 
