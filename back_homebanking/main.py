@@ -12,8 +12,8 @@ from app.core.cfg_config import settings
 from app.routes import route_auth, route_creditos, route_cuentas, route_operaciones
 
 app = FastAPI(
-    title="Banca Internet Banco Andino — Homebanking API",
-    description="Portal del cliente de Banca Internet Banco Andino. Solo consultas y "
+    title="Banca Internet Banco Pichincha — Homebanking API",
+    description="Portal del cliente de Banca Internet Banco Pichincha. Solo consultas y "
     "operaciones del cliente del portal (dcliente / usuarios_homebanking).",
     version="1.0.0",
 )
@@ -35,7 +35,7 @@ app.include_router(route_creditos.router)
 @app.get("/", tags=["root"])
 def raiz():
     return {
-        "servicio": "Banca Internet Banco Andino — Homebanking API",
+        "servicio": "Banca Internet Banco Pichincha — Homebanking API",
         "version": "1.0.0",
         "estado": "ok",
         "docs": "/docs",
