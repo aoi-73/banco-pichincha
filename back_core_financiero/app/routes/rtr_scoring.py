@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.core.cfg_database import get_db
+from app.core.cfg_auth import get_current_user
 from app.schemas.sch_scoring import ScoringIn, ScoringOut
 from app.controllers import ctl_scoring
 
 router = APIRouter()
 
 @router.post("/evaluar", response_model=ScoringOut)
-def evaluar(data: ScoringIn, db: Session = Depends(get_db)):
+def evaluar(data: ScoringIn, db: Session = Depends(get_db),
+            user: dict = Depends(get_current_user)):
     return ctl_scoring.calcular_score(
         codcliente            = data.codcliente,
         montosolicitud        = data.montosolicitud,

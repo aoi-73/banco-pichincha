@@ -102,7 +102,7 @@ def solicitar(data: SolicitudIn, db: Session = Depends(get_db),
 @router.post("/pagar")
 def pagar(data: PagoIn, db: Session = Depends(get_db), cli: dict = Depends(cliente_actual)):
     """Paga la próxima cuota pendiente de un crédito del cliente."""
-    cuota = rephb.proxima_cuota(db, data.codcuentacredito)
+    cuota = rephb.proxima_cuota(db, data.codcuentacredito, cli["pkcliente"])
     if not cuota:
         raise HTTPException(status_code=404, detail="Sin cuotas pendientes para ese crédito")
     monto = data.monto if data.monto is not None else float(cuota.montocuota or 0)

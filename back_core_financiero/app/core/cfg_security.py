@@ -1,15 +1,17 @@
 from datetime import datetime, timedelta
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from app.core.cfg_config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    # bcrypt directo (passlib 1.7.4 es incompatible con bcrypt>=4, ver seed_homebanking.py)
+    return bcrypt.hashpw(password.encode()[:72], bcrypt.gensalt()).decode()
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    try:
+        return bcrypt.checkpw(plain.encode()[:72], hashed.encode())
+    except (ValueError, TypeError):
+        return False
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()

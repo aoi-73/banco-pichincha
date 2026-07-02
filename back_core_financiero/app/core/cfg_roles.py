@@ -41,6 +41,10 @@ PERMISOS = {
     "gestionar_cobranza": {"asesor", "administrador"},  # SMS/llamada/visita/compromiso
     "derivar_judicial":  {"administrador", "gerencia"},  # pasar a cobranza judicial
     "castigar_credito":  {"comite", "gerencia"},         # castigo contable (>180 días)
+    # Dashboard / KPIs gerenciales (Auditoría Criterio 3, punto 2)
+    "consultar_dashboard": {"administrador", "gerencia", "jefe_regional"},
+    # Ver la cartera de OTRO asesor (no la propia) (Auditoría Criterio 3, punto 3.1)
+    "ver_cartera_ajena": {"administrador", "gerencia", "jefe_regional"},
 }
 
 

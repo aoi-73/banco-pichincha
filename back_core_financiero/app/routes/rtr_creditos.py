@@ -214,16 +214,26 @@ def productos_disponibles(
 
 @router.get("/cartera")
 def cartera(
-    pkasesor: int = Query(..., description="PK del asesor autenticado"),
+    pkasesor: Optional[int] = Query(None, description="Solo para roles con visión de cartera ajena"),
     periodomes: int = Query(202512),
     db: Session = Depends(get_db),
+    user: dict = Depends(get_current_user),
 ):
+    if pkasesor is not None and pkasesor != user.get("pkasesor"):
+        if not puede(user.get("rol", ""), "ver_cartera_ajena"):
+            raise HTTPException(status_code=403,
+                                detail=f"El rol '{user.get('rol')}' no puede ver cartera de otro asesor")
+    else:
+        pkasesor = user.get("pkasesor")
+    if pkasesor is None:
+        raise HTTPException(status_code=400, detail="El usuario autenticado no tiene un asesor asociado")
     rows = rep_creditos.get_cartera_asesor(db, pkasesor, periodomes)
     return [dict(r._mapping) for r in rows]
 
 
 @router.get("/{codcuentacredito}")
-def detalle(codcuentacredito: str, db: Session = Depends(get_db)):
+def detalle(codcuentacredito: str, db: Session = Depends(get_db),
+            user: dict = Depends(get_current_user)):
     row = rep_creditos.get_detalle(db, codcuentacredito)
     if not row:
         raise HTTPException(status_code=404, detail="Crédito no encontrado")
@@ -231,6 +241,7 @@ def detalle(codcuentacredito: str, db: Session = Depends(get_db)):
 
 
 @router.get("/{codcuentacredito}/cronograma")
-def cronograma(codcuentacredito: str, db: Session = Depends(get_db)):
+def cronograma(codcuentacredito: str, db: Session = Depends(get_db),
+                user: dict = Depends(get_current_user)):
     rows = rep_creditos.get_cronograma(db, codcuentacredito)
     return [dict(r._mapping) for r in rows]

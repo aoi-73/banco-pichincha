@@ -219,4 +219,20 @@ END $$;
 --    Si se desea, ejecutarlo desde el backend tras cargar los datos.
 -- ============================================================================
 
+-- ============================================================================
+-- F. CREDENCIALES DE PERSONAL (login real con contraseña hasheada)
+--    Tabla puente pkpersonal <-> password_hash, mismo patrón que
+--    dpersonalcargo/dpersonalasesor. El hash se siembra desde Python
+--    (bcrypt) con scripts/setup_dpersonalcredenciales.py, no aquí, porque
+--    el hashing no es expresable en SQL puro.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS dpersonalcredenciales (
+    pkpersonalcredenciales SERIAL PRIMARY KEY,
+    pkpersonal             INTEGER NOT NULL REFERENCES dpersonal(pkpersonal),
+    password_hash          VARCHAR(100) NOT NULL,
+    fecultactualizacion    TIMESTAMP DEFAULT NOW(),
+    UNIQUE (pkpersonal)
+);
+
 -- Fin del script 07.

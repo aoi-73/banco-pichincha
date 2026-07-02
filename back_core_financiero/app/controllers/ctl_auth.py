@@ -11,12 +11,14 @@ def login(db: Session, numerodni: str, password: str):
         SELECT p.pkpersonal, p.codpersonal, p.nombre,
                cp.codcargopersonal,
                cp.descargopersonal,
-               a.pkasesor, a.codasesor
+               a.pkasesor, a.codasesor,
+               cred.password_hash
         FROM dpersonal p
-        LEFT JOIN dpersonalcargo pc  ON pc.pkpersonal = p.pkpersonal
-        LEFT JOIN dcargopersonal cp  ON cp.pkcargopersonal = pc.pkcargopersonal
-        LEFT JOIN dpersonalasesor pa ON pa.pkpersonal = p.pkpersonal
-        LEFT JOIN dasesor a          ON a.pkasesor = pa.pkasesor
+        LEFT JOIN dpersonalcargo pc         ON pc.pkpersonal = p.pkpersonal
+        LEFT JOIN dcargopersonal cp         ON cp.pkcargopersonal = pc.pkcargopersonal
+        LEFT JOIN dpersonalasesor pa        ON pa.pkpersonal = p.pkpersonal
+        LEFT JOIN dasesor a                 ON a.pkasesor = pa.pkasesor
+        LEFT JOIN dpersonalcredenciales cred ON cred.pkpersonal = p.pkpersonal
         WHERE p.numerodni = :dni
         LIMIT 1
     """)
@@ -24,9 +26,7 @@ def login(db: Session, numerodni: str, password: str):
     if not row:
         return None
 
-    # En desarrollo: password = numerodni (simplificado)
-    # En producción: verify_password(password, row.password_hash)
-    if password != numerodni:
+    if not row.password_hash or not verify_password(password, row.password_hash):
         return None
 
     rol        = rol_desde_cargo(row.codcargopersonal)

@@ -62,8 +62,8 @@ def creditos_cliente(db: Session, pkcliente: int):
     """), {"pk": pkcliente}).fetchall()
 
 
-def proxima_cuota(db: Session, codcuentacredito: str):
-    """Primera cuota pendiente (sin pago de capital) de un crédito."""
+def proxima_cuota(db: Session, codcuentacredito: str, pkcliente: int):
+    """Primera cuota pendiente (sin pago de capital) de un crédito del cliente autenticado."""
     return db.execute(text("""
         SELECT p.pkcuentacredito, p.nrocuota, p.montocuota, p.montosaldo,
                p.fechavencimientopagocuota, p.montocapitalprogramado,
@@ -71,10 +71,11 @@ def proxima_cuota(db: Session, codcuentacredito: str):
         FROM fplanpagomes p
         JOIN dcuentacredito cc ON cc.pkcuentacredito = p.pkcuentacredito
         WHERE cc.codcuentacredito = :cod
+          AND cc.pkcliente = :pkcliente
           AND COALESCE(p.montocapitalpagado,0) = 0
         ORDER BY p.nrocuota
         LIMIT 1
-    """), {"cod": codcuentacredito}).fetchone()
+    """), {"cod": codcuentacredito, "pkcliente": pkcliente}).fetchone()
 
 
 def registrar_pago(db: Session, cuota, monto: float, pkcliente: int) -> dict:

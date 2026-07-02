@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.core.cfg_database import get_db
+from app.core.cfg_auth import get_current_user
 from app.repositories import rep_ahorros
 
 router = APIRouter()
@@ -9,7 +10,8 @@ router = APIRouter()
 def resumen_agencia(
     codagencia: str,
     periodomes: int = Query(20251231),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user: dict = Depends(get_current_user)
 ):
     rows = rep_ahorros.get_resumen_agencia(db, codagencia, periodomes)
     return [dict(r._mapping) for r in rows]
@@ -18,7 +20,8 @@ def resumen_agencia(
 def cuentas_cliente(
     codcliente: str,
     periodomes: int = Query(20251231),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user: dict = Depends(get_current_user)
 ):
     rows = rep_ahorros.get_cuentas_cliente(db, codcliente, periodomes)
     return [dict(r._mapping) for r in rows]
@@ -27,7 +30,8 @@ def cuentas_cliente(
 def detalle(
     codcuentaahorro: str,
     periodomes: int = Query(20251231),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user: dict = Depends(get_current_user)
 ):
     row = rep_ahorros.get_detalle(db, codcuentaahorro, periodomes)
     if not row:

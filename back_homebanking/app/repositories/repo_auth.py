@@ -21,9 +21,7 @@ def buscar_usuario_por_username(conn: Connection, username: str) -> dict | None:
         WHERE LOWER(u.username) = LOWER(:username)
         """
     )
-    print(username)
     row = conn.execute(sql, {"username": username}).mappings().first()
-    print(row)
     return dict(row) if row else None
 
 
