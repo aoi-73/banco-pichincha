@@ -37,7 +37,8 @@ PERMISOS = {
     "enviar_comite":     {"asesor", "administrador"},
     "resolver_comite":   {"comite", "administrador", "gerencia"},
     # Recuperaciones / Mora
-    "consultar_mora":    {"asesor", "administrador", "riesgos", "gerencia", "analista"},
+    # comite necesita ver la bandeja para poder ejercer castigar_credito, que ya tenía.
+    "consultar_mora":    {"asesor", "administrador", "riesgos", "gerencia", "analista", "comite"},
     "gestionar_cobranza": {"asesor", "administrador"},  # SMS/llamada/visita/compromiso
     "derivar_judicial":  {"administrador", "gerencia"},  # pasar a cobranza judicial
     "castigar_credito":  {"comite", "gerencia"},         # castigo contable (>180 días)

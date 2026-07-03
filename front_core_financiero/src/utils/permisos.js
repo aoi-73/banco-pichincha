@@ -11,7 +11,8 @@ export const PERMISOS = {
   enviar_comite: ['asesor', 'administrador'],
   resolver_comite: ['comite', 'administrador', 'gerencia'],
   // Recuperaciones / mora (espejo de cfg_roles.py).
-  consultar_mora: ['asesor', 'administrador', 'riesgos', 'gerencia', 'analista'],
+  // comite necesita ver la bandeja para poder ejercer castigar_credito, que ya tenía.
+  consultar_mora: ['asesor', 'administrador', 'riesgos', 'gerencia', 'analista', 'comite'],
   gestionar_cobranza: ['asesor', 'administrador'],
   derivar_judicial: ['administrador', 'gerencia'],
   castigar_credito: ['comite', 'gerencia'],
