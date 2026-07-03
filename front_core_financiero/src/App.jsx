@@ -134,7 +134,7 @@ export default function App() {
       <Route
         path="/recuperaciones"
         element={
-          <PrivateRoute roles={['asesor', 'administrador', 'riesgos', 'gerencia', 'analista']}>
+          <PrivateRoute roles={['asesor', 'administrador', 'riesgos', 'gerencia', 'analista', 'comite']}>
             <AppLayout>
               <RecuperacionesPage />
             </AppLayout>
