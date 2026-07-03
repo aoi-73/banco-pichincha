@@ -73,10 +73,17 @@ def registrar_evaluacion(db: Session, codsolicitud: str, *, es_microempresa: boo
     return {"codsolicitud": codsolicitud, "pkevaluacion": pkeval, "excedente": excedente, "creada": True}
 
 
-def desembolsar(db: Session, sol) -> dict:
+def desembolsar(db: Session, sol, *, tea: float) -> dict:
     """
-    Crea la cuenta de crédito y el movimiento de desembolso para una solicitud APROBADA.
-    `sol` es la fila de rep_solicitudes.obtener (debe tener pksolicitud, pkcliente, monto, etc.).
+    Crea la cuenta de crédito, el movimiento de desembolso y la fila de
+    fagcuentacredito (saldos/estado del periodo) para una solicitud APROBADA.
+    `sol` es la fila de rep_solicitudes.obtener (debe tener pksolicitud, pkcliente,
+    pkagencia, pkasesor, pkproducto, monto, etc.).
+    `tea` es la tasa efectiva anual sugerida para el tipo de crédito real de la
+    solicitud (ver rep_solicitudes.obtener_codtipocredito), no un valor adivinado.
+
+    Sin la fila en fagcuentacredito el crédito queda invisible en cartera y en el
+    Homebanking, que hacen INNER JOIN contra ella filtrando por periodomes.
     """
     monto = float(sol.montoaprobadocredito or sol.montosolicitudcredito or 0)
 
@@ -114,6 +121,38 @@ def desembolsar(db: Session, sol) -> dict:
     """), {"pkcc": cc.pkcuentacredito, "con": cat.con, "tipo": cat.tipo, "medio": cat.medio,
            "canal": cat.canal, "mon": cat.mon, "cond": cat.cond, "prod": cat.prod,
            "ag": cat.ag, "monto": monto, "fh": hoy, "pd": pd})
+
+    # fila de hechos (saldos/estado del periodo): sin esto el crédito no aparece
+    # en /creditos/cartera ni en el Homebanking (ambos hacen INNER JOIN contra ella).
+    tasa_moratoria = round(tea * 1.5, 6)
+    pkproducto = sol.pkproducto or cat.prod
+    pkagencia = sol.pkagencia or cat.ag
+    nrocuotas = int(sol.plazosolicitudcredito or sol.nrocuotasolicitud or 1)
+    db.execute(text("""
+        INSERT INTO fagcuentacredito (
+            periodomes, pkcuentacredito, pksolicitud, pkestadocredito, nrocuotas,
+            montoaprobadocredito, montocapitaldesembolsado,
+            pkproducto, pkmoneda, tasainterescompensatoria, tasainteresmoratoria,
+            fechadesembolsocredito, pkcliente, pkagencia, pkasesor,
+            montosaldocapital, montosaldocliente, car_vig_capital
+        ) VALUES (
+            :periodo, :pkcc, :pksol,
+            (SELECT pkestadocredito FROM destadocredito WHERE codestadocredito = '01'),
+            :ncuotas, :monto, :monto,
+            :pkprod, :pkmon, :teacomp, :teamora,
+            :fechadesembolso, :pkcli, :pkag, :pkases,
+            :monto, :monto, :monto
+        )
+        ON CONFLICT (periodomes, pkcuentacredito) DO NOTHING
+    """), {
+        "periodo": PERIODO, "pkcc": cc.pkcuentacredito, "pksol": sol.pksolicitud,
+        "ncuotas": nrocuotas, "monto": monto,
+        "pkprod": pkproducto, "pkmon": cat.mon,
+        "teacomp": tea, "teamora": tasa_moratoria,
+        "fechadesembolso": hoy.date(), "pkcli": sol.pkcliente,
+        "pkag": pkagencia, "pkases": sol.pkasesor,
+    })
+
     db.commit()
     return {"codcuentacredito": cc.codcuentacredito, "monto_desembolsado": monto,
             "fecha": hoy.date().isoformat()}

@@ -246,13 +246,16 @@ def registrar_evaluacion(db: Session, codsolicitud: str, *, ingreso: float,
 
 
 def desembolsar(db: Session, codsolicitud: str) -> dict:
-    """Actividades 45-48: desembolsa una solicitud APROBADA (crea cuenta + movimiento)."""
+    """Actividades 45-48: desembolsa una solicitud APROBADA (crea cuenta + movimiento
+    + la fila de fagcuentacredito que hace visible el crédito en cartera/Homebanking)."""
     sol = repsol.obtener(db, codsolicitud)
     if not sol:
         return {"error": "Solicitud no encontrada"}
     if sol.pksolicitudestado != repsol.ESTADO_APROBADO:
         return {"error": "La solicitud no está aprobada", "estado": sol.dessolicitudestado}
-    res = rep_evaluacion.desembolsar(db, sol)
+    codtipocredito = repsol.obtener_codtipocredito(db, sol.pksolicitud)
+    tea = ctl_scoring.TEA_POR_TIPO.get(codtipocredito, {"mid": 40.0})["mid"]
+    res = rep_evaluacion.desembolsar(db, sol, tea=tea)
     repsol.cambiar_estado(db, codsolicitud, repsol.ESTADO_DESEMBOLSADO,
                           motivo="Desembolsado vía core")
     return {"codsolicitud": codsolicitud, "estado": "Desembolsado", **res}
@@ -271,9 +274,8 @@ def generar_cronograma(db: Session, codsolicitud: str) -> dict:
 
     monto = float(sol.montoaprobadocredito or sol.montosolicitudcredito or 0)
     plazo = int(sol.plazosolicitudcredito or sol.nrocuotasolicitud or 12)
-    tea = ctl_scoring.TEA_POR_TIPO.get(
-        (sol.codtiposolicitud or "CO"), {"mid": 40.0}
-    )["mid"]
+    codtipocredito = repsol.obtener_codtipocredito(db, sol.pksolicitud)
+    tea = ctl_scoring.TEA_POR_TIPO.get(codtipocredito, {"mid": 40.0})["mid"]
     tem = (1 + tea / 100) ** (1 / 12) - 1
     cuota = monto * tem * (1 + tem) ** plazo / ((1 + tem) ** plazo - 1) if tem > 0 else monto / plazo
 

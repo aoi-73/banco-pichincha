@@ -111,6 +111,14 @@ def map_tipo_func(cod_prod: str) -> str:
     return _TIPO_PROD_A_FUNC.get((cod_prod or "").strip(), (cod_prod or "").strip())
 
 
+_FUNC_A_TIPO_PROD = {v: k for k, v in _TIPO_PROD_A_FUNC.items()}
+
+
+def map_tipo_prod(cod_func: str) -> str:
+    """ME->01, PE->02, CO->03 (inverso de map_tipo_func, para filtrar dproducto)."""
+    return _FUNC_A_TIPO_PROD.get((cod_func or "").strip(), (cod_func or "").strip())
+
+
 def segmento_de(cod_func: str) -> str:
     """ME/PE -> EMPRESARIAL, CO -> CONSUMO."""
     return _SEGMENTO.get(cod_func, "OTRO")

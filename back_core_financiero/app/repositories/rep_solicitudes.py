@@ -11,6 +11,8 @@ from datetime import datetime, date
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
+from app.repositories import rep_creditos
+
 # Estados (dsolicitudestado)
 ESTADO_EN_EVALUACION = 1
 ESTADO_APROBADO      = 2
@@ -32,11 +34,16 @@ def _pkmoneda_soles(db: Session) -> int:
 
 
 def _pkproducto_por_tipo(db: Session, codtipocredito: str) -> int:
-    """Primer producto del tipo de crédito dado; fallback al primero existente."""
+    """Primer producto del tipo de crédito dado (ME/PE/CO); fallback al primero existente.
+
+    dproducto.codtipocredito usa códigos '01'/'02'/'03', no las letras ME/PE/CO
+    que manda el frontend/scoring — hay que mapear con rep_creditos.map_tipo_prod
+    antes de filtrar, si no, el WHERE nunca matchea y siempre cae al fallback.
+    """
     row = db.execute(text(
         "SELECT pkproducto FROM dproducto WHERE codtipocredito = :t "
         "ORDER BY pkproducto LIMIT 1"
-    ), {"t": codtipocredito}).scalar()
+    ), {"t": rep_creditos.map_tipo_prod(codtipocredito)}).scalar()
     if row:
         return int(row)
     return int(db.execute(text("SELECT MIN(pkproducto) FROM dproducto")).scalar() or 1)
@@ -108,6 +115,23 @@ def crear(db: Session, *, pkcliente: int, pkasesor: int | None,
     return {"pksolicitud": row.pksolicitud, "codsolicitud": row.codsolicitud}
 
 
+def obtener_codtipocredito(db: Session, pksolicitud: int) -> str:
+    """Tipo de crédito real (ME/PE/CO) vía dsolicitud -> dproducto.
+
+    codtiposolicitud NO sirve para esto: es el tipo de SOLICITUD (siempre '01' =
+    Crédito Nuevo), no el tipo de crédito/producto. dproducto.codtipocredito
+    tampoco es directamente ME/PE/CO: es '01'/'02'/'03' y hay que mapearlo con
+    rep_creditos.map_tipo_func (mismo mapeo que usa /creditos/productos).
+    """
+    row = db.execute(text("""
+        SELECT p.codtipocredito
+        FROM dsolicitud s
+        JOIN dproducto p ON p.pkproducto = s.pkproducto
+        WHERE s.pksolicitud = :pk
+    """), {"pk": pksolicitud}).scalar()
+    return rep_creditos.map_tipo_func(row) if row else "CO"
+
+
 def obtener(db: Session, codsolicitud: str):
     return db.execute(text("""
         SELECT s.pksolicitud, s.codsolicitud, s.pkcliente, cl.codcliente, cl.nomcliente,
@@ -115,7 +139,8 @@ def obtener(db: Session, codsolicitud: str):
                s.codtiposolicitud, s.pksolicitudestado, e.dessolicitudestado,
                s.pknivelaprobacion, na.desnivelaprobacion,
                s.montoaprobadocredito, s.fechaaprobacioncredito,
-               s.desmotivosolicitud, s.fechasolicitudcredito
+               s.desmotivosolicitud, s.fechasolicitudcredito,
+               s.pkagencia, s.pkasesor, s.pkproducto
         FROM dsolicitud s
         LEFT JOIN dcliente cl          ON cl.pkcliente = s.pkcliente
         LEFT JOIN dsolicitudestado e   ON e.pksolicitudestado = s.pksolicitudestado
